@@ -1,4 +1,5 @@
 #include "Graphics.h"
+#include"Sound.h"
 #include "Input.h"
 #include "Ball.h"
 #include "Paddle.h"
@@ -23,5 +24,6 @@ private:
 	Paddle _paddle1;
 	Paddle _paddle2;
 	Score score;
+	Sound sound;
 };
 

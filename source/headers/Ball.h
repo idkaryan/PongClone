@@ -1,29 +1,30 @@
 #include "Graphics.h"
 #include "Paddle.h"
 #include "Score.h"
+#include "Sound.h"
 
 #pragma once
 class Ball
 {
 public:
 	Ball();
-	Ball(int x, int y, int ballRadius, Graphics &graphics);
+	Ball(float x, float y, int ballRadius, Graphics &graphics);
 	
 	void draw(Graphics &graphics);
-	void update(Paddle pad, Score &score);
+	void update(Paddle pad, Score &score, Sound &sound);
 
 	void resetBaul();
-	int getX() { return this->_x; }
+	float getX() { return this->_x; }
 private:
 	SDL_Texture* ballTexture;
-	int _x;
-	int _y;
-	int _dx;
-	int _dy;
+	float _x;
+	float _y;
+	float _dx;
+	float _dy;
 	int _ballRadius;
 
-	void accelerateBallAlongY(int velAlongY);
-	void changeYdir();
-	void changeXdir();
+	void accelerateBallAlongY(float velAlongY);
+	void changeYdir(Sound &sound);
+	void changeXdir(Sound &sound);
 };
 
