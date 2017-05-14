@@ -17,6 +17,7 @@ void Game::gameLoop() {
 	Graphics graphics;
 	Input input;
 
+
 	// Setting up entities for the game : 
 	this->_ball = Ball(globals::SCREEN_WIDTH / 2, globals::SCREEN_WIDTH / 2, entityConstants::BALL_RADIUS, graphics);
 	this->_paddle1 = Paddle(entityConstants::PADDLE1POSITION_X, globals::SCREEN_HEIGHT / 2, 
@@ -121,8 +122,8 @@ void Game::draw(Graphics &graphics){
 void Game::update() {
 	// half the work only
 	(_ball.getX() < globals::SCREEN_WIDTH / 2) ?
-		this->_ball.update(_paddle1, this->score) :
-		this->_ball.update(_paddle2, this->score);
+		this->_ball.update(_paddle1, this->score, this->sound) :
+		this->_ball.update(_paddle2, this->score, this->sound);
 
 	this->_paddle1.update();
 	this->_paddle2.update();

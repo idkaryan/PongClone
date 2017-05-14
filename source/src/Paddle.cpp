@@ -10,11 +10,11 @@ Paddle::Paddle(int x, int y, int length, int breadth, Graphics &graphics) :
 		_breadth(breadth),
 		_dy(0)
 {
-	this->paddleTexture = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadImage("content/paddle.png"));
+	this->paddleTexture = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadImage("content/padd.png"));
 }
 
 void Paddle::draw(Graphics &graphics) {
-	SDL_Rect sourceRect = { 0, 0, 103, 596 };
+	SDL_Rect sourceRect = { 0, 0, 100, 400 };
 	SDL_Rect destRect = { this->_x - (this->_breadth) / 2, this->_y - (this->_length) / 2, this->_breadth, this->_length };
 	graphics.blitSurface(this->paddleTexture, &sourceRect, &destRect);
 }

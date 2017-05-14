@@ -8,7 +8,7 @@ double d2r(double d) {
 }
 
 Ball::Ball(){}
-Ball::Ball(int x, int y, int ballRadius, Graphics &graphics) :
+Ball::Ball(float x, float y, int ballRadius, Graphics &graphics) :
 	_x(x),
 	_y(y),
 	_ballRadius(ballRadius)
@@ -25,15 +25,17 @@ void Ball::draw(Graphics &graphics) {
 	graphics.blitSurface(this->ballTexture, &sourceRect, &destRect);
 }
 
-void Ball::update(Paddle pad, Score &score) {
+void Ball::update(Paddle pad, Score &score, Sound &sound) {
 	//	Upper and Lower wall collision check :
 	if (this->_y - entityConstants::newBallRadius < 0) {
 		this->_y = entityConstants::newBallRadius;
-		this->changeYdir();
+		this->changeYdir(sound);
+		
 	}
 	else if (this->_y + entityConstants::newBallRadius > globals::SCREEN_HEIGHT) {
 		this->_y = globals::SCREEN_HEIGHT - entityConstants::newBallRadius;
-		this->changeYdir();
+		this->changeYdir(sound);
+
 	}
 	
 	// Paddle collisions check : 
@@ -42,10 +44,10 @@ void Ball::update(Paddle pad, Score &score) {
 	if (this->_x - entityConstants::newBallRadius < (pad.getX() + entityConstants::PaddleCollConstantW) &&
 		this->_x + entityConstants::newBallRadius >(pad.getX() + entityConstants::PaddleCollConstantW) &&
 		this->_y > pad.getY() - entityConstants::PADDLE_LENGTH / 2 &&
-		this->_y < pad.getY() + entityConstants::PADDLE_LENGTH / 2)
+		this->_y < pad.getY() + entityConstants::PADDLE_LENGTH / 2 )
 	{
 		this->_x = pad.getX() + (entityConstants::PaddleCollConstantW + entityConstants::newBallRadius);
-		this->changeXdir();
+		this->changeXdir(sound);
 
 		this->accelerateBallAlongY(pad.getVelocity());
 	}
@@ -57,7 +59,7 @@ void Ball::update(Paddle pad, Score &score) {
 		this->_y < pad.getY() + entityConstants::PaddleCollConstantL)
 	{
 		this->_x = pad.getX() - entityConstants::PaddleCollConstantW - entityConstants::newBallRadius;
-		this->changeXdir();
+		this->changeXdir(sound);
 		this->accelerateBallAlongY(pad.getVelocity());
 	}
 	
@@ -65,10 +67,10 @@ void Ball::update(Paddle pad, Score &score) {
 	else if (this->_x > pad.getX() - entityConstants::PaddleCollConstantW &&
 		this->_x < pad.getX() + entityConstants::PaddleCollConstantW &&
 		this->_y + entityConstants::newBallRadius > pad.getY() - entityConstants::PaddleCollConstantL &&
-		this->_y - entityConstants::newBallRadius < pad.getY() - entityConstants::PaddleCollConstantL )
+		this->_y - entityConstants::newBallRadius < pad.getY() - entityConstants::PaddleCollConstantL)
 	{
 		this->_y = pad.getY() - entityConstants::PaddleCollConstantL - entityConstants::newBallRadius;
-		this->changeYdir();
+		this->changeYdir(sound);
 
 		this->accelerateBallAlongY(pad.getVelocity());
 	}
@@ -80,7 +82,7 @@ void Ball::update(Paddle pad, Score &score) {
 		this->_y + entityConstants::newBallRadius > pad.getY() + entityConstants::PaddleCollConstantL)
 	{
 		this->_y = pad.getY() + entityConstants::PaddleCollConstantL + entityConstants::newBallRadius;
-		this->changeYdir();
+		this->changeYdir(sound);
 
 		this->accelerateBallAlongY(pad.getVelocity());
 	}
@@ -89,25 +91,31 @@ void Ball::update(Paddle pad, Score &score) {
 
 	// Right player scores
 	if (this->_x + entityConstants::newBallRadius < 0) {
+		
 		score.rightScores();
 		this->resetBaul();
+		sound.playScoreSound();
 	}
 	// Left Player Scores
 	else if (this->_x - entityConstants::newBallRadius > globals::SCREEN_WIDTH) {
+
 		score.leftScores();
 		this->resetBaul();
+		sound.playScoreSound();
 	}
 
 	this->_x += this->_dx;
 	this->_y += this->_dy;
 }
 
-void Ball::changeYdir() {
+void Ball::changeYdir(Sound &sound) {
 	this->_dy = -this->_dy;
+	sound.playCollisionSound();
 }
 
-void Ball::changeXdir() {
+void Ball::changeXdir(Sound &sound) {
 	this->_dx = -this->_dx;
+	sound.playCollisionSound();
 }
 
 void Ball::resetBaul() {
@@ -115,7 +123,7 @@ void Ball::resetBaul() {
 	std::uniform_int_distribution<int> leftOrRight(0, 1);
 
 	int angle = 0;
-	int velocity = entityConstants::BALL_VELOCITY;
+	float velocity = entityConstants::BALL_VELOCITY;
 
 	if (leftOrRight(get)) {
 		std::uniform_int_distribution<int> towardsRight(-60, 60);
@@ -130,10 +138,14 @@ void Ball::resetBaul() {
 	this->_dy = sin(d2r(angle)) * velocity;
 	this->_x = globals::SCREEN_WIDTH / 2;
 	this->_y = globals::SCREEN_HEIGHT / 2;
+	
+
+	printf("xspeed = %f\n", _dx);
+	printf("yspeed = %f\n", _dy);
 
 }
 
-void Ball::accelerateBallAlongY(int velAlongY) {
+void Ball::accelerateBallAlongY(float velAlongY) {
 	_dy += velAlongY;
 	if (_dy > entityConstants::MAX_BALL_Y_VEL) {
 		_dy = entityConstants::MAX_BALL_Y_VEL;
